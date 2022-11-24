@@ -16,7 +16,7 @@ async function cronIp() {
   console.log("cron running...");
   let allHost = await IpList.find();
   for (let host of allHost) {
-    let res = await ping.promise.probe(host.ip, { timeout: 30 });
+    let res = await ping.promise.probe(host.ip, { timeout: 10 });
     data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
   }
 
@@ -30,7 +30,7 @@ async function cronIp() {
   }
 }
 
-cron.schedule("*/60 * * * * *", () => {
+cron.schedule("*/30 * * * * *", () => {
   cronIp();
   console.log("running a task every 60 seconds");
 });
