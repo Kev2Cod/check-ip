@@ -20,9 +20,10 @@ async function cronIp() {
     data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
   }
 
+  console.log(data);
+
   for (let item of data) {
-    console.log("updating");
-    IpList.findOneAndUpdate(
+    await IpList.findOneAndUpdate(
       { ip: item.ip },
       { status: item.status },
       { upsert: true }
@@ -34,6 +35,8 @@ cron.schedule("*/30 * * * * *", () => {
   cronIp();
   console.log("running a task every 60 seconds");
 });
+
+cronIp();
 
 app.get("/", async (req, res) => {
   let resp = await IpList.find();
