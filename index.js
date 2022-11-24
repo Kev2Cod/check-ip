@@ -19,7 +19,7 @@ app.get("/", async (req, res) => {
   ];
   let data = [];
   for (let host of allHost) {
-    let res = await ping.promise.probe(host, { timeout: 8 });
+    let res = await ping.promise.probe(host, { timeout: 10 });
     console.log(res);
     data.push({ ip: host, status: res.alive ? "Alive" : "is Dead" });
   }
@@ -47,7 +47,7 @@ app.get("/dead", async (req, res) => {
 
   let data = [];
   for (let host of allHost) {
-    let res = await ping.promise.probe(host, { timeout: 8 });
+    let res = await ping.promise.probe(host, { timeout: 10 });
     console.log(res);
     data.push({ ip: host, status: res.alive ? "Alive" : "is Dead" });
   }
@@ -73,7 +73,7 @@ app.get("/alive", async (req, res) => {
   ];
   let data = [];
   for (let host of allHost) {
-    let res = await ping.promise.probe(host, { timeout: 8 });
+    let res = await ping.promise.probe(host, { timeout: 10 });
     console.log(res);
     data.push({ ip: host, status: res.alive ? "Alive" : "is Dead" });
   }
