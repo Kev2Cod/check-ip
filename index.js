@@ -31,9 +31,9 @@ async function cronIp() {
   }
 }
 
-cron.schedule("*/30 * * * * *", () => {
+cron.schedule("*/60 * * * * *", () => {
   cronIp();
-  console.log("running a task every 30 seconds");
+  console.log("running a task every 60 seconds");
 });
 
 app.get("/", async (req, res) => {
