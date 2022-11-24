@@ -1,85 +1,76 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+var cron = require("node-cron");
+const mongoose = require("mongoose");
 var ping = require("ping");
+mongoose
+  .connect("mongodb+srv://kevin:2wsx1qaz@cluster0.ko78p2k.mongodb.net/GG")
+  .then(() => console.log("Connect Mongo Success..."));
+
+const ipSchema = new mongoose.Schema({ ip: String, status: String });
+const IpList = mongoose.model("ip_address", ipSchema);
+
+let data = [];
+async function cronIp() {
+  console.log("cron running...");
+  let allHost = await IpList.find();
+  for (let host of allHost) {
+    let res = await ping.promise.probe(host.ip, { timeout: 10 });
+    data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
+  }
+  data.map((item) => {
+    IpList.findOneAndUpdate(
+      { ip: item.ip },
+      { status: item.status ? "Alive" : "is Dead" }
+    );
+  });
+}
+
+cron.schedule("*/60 * * * * *", () => {
+  cronIp();
+  console.log("running a task every 60 seconds");
+});
 
 app.get("/", async (req, res) => {
-  let allHost = [
-    "10.10.65.1",
-    "10.10.65.2",
-    "10.10.65.3",
-    "10.10.65.4",
-    "10.10.65.5",
-    "10.207.26.20",
-    "10.207.26.21",
-    "10.207.26.22",
-    "10.207.26.23",
-    "10.207.26.24",
-    "10.207.26.25",
-  ];
-  let data = [];
-  for (let host of allHost) {
-    let res = await ping.promise.probe(host, { timeout: 10 });
-    console.log(res);
-    data.push({ ip: host, status: res.alive ? "Alive" : "is Dead" });
-  }
+  let resp = await IpList.find();
+
+  let result = resp.map((item) => ({
+    ip: item.ip,
+    status: item.status,
+  }));
+
   res.json({
-    total_dead: data.filter((item) => item.status === "is Dead").length,
-    total_alive: data.filter((item) => item.status === "Alive").length,
-    result: data,
+    total_dead: result.filter((item) => item.status === "is Dead").length,
+    total_alive: result.filter((item) => item.status === "Alive").length,
+    result: result,
   });
 });
 
 app.get("/dead", async (req, res) => {
-  let allHost = [
-    "10.10.65.1",
-    "10.10.65.2",
-    "10.10.65.3",
-    "10.10.65.4",
-    "10.10.65.5",
-    "10.207.26.20",
-    "10.207.26.21",
-    "10.207.26.22",
-    "10.207.26.23",
-    "10.207.26.24",
-    "10.207.26.25",
-  ];
+  let resp = await IpList.find();
 
-  let data = [];
-  for (let host of allHost) {
-    let res = await ping.promise.probe(host, { timeout: 10 });
-    console.log(res);
-    data.push({ ip: host, status: res.alive ? "Alive" : "is Dead" });
-  }
+  let result = resp.map((item) => ({
+    ip: item.ip,
+    status: item.status,
+  }));
   res.json({
-    total_dead: data.filter((item) => item.status === "is Dead").length,
-    result: data.filter((item) => item.status === "is Dead"),
+    total_dead: result.filter((item) => item.status === "is Dead").length,
+    result: result.filter((item) => item.status === "is Dead"),
   });
 });
 
 app.get("/alive", async (req, res) => {
-  let allHost = [
-    "10.10.65.1",
-    "10.10.65.2",
-    "10.10.65.3",
-    "10.10.65.4",
-    "10.10.65.5",
-    "10.207.26.20",
-    "10.207.26.21",
-    "10.207.26.22",
-    "10.207.26.23",
-    "10.207.26.24",
-    "10.207.26.25",
-  ];
-  let data = [];
-  for (let host of allHost) {
-    let res = await ping.promise.probe(host, { timeout: 10 });
-    console.log(res);
-    data.push({ ip: host, status: res.alive ? "Alive" : "is Dead" });
-  }
+  let resp = await IpList.find();
+
+  let result = resp.map((item) => ({
+    ip: item.ip,
+    status: item.status,
+  }));
+
   res.json({
-    total_alive: data.filter((item) => item.status === "Alive").length,
-    result: data.filter((item) => item.status === "Alive"),
+    total_alive: result.filter((item) => item.status === "Alive").length,
+    result: result.filter((item) => item.status === "Alive"),
   });
 });
 
