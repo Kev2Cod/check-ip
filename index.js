@@ -22,14 +22,10 @@ async function cronIp() {
 
   for (let item of data) {
     console.log("updating");
-    console.log(item);
     IpList.findOneAndUpdate(
       { ip: item.ip },
       { status: item.status },
-      { upsert: true },
-      function (err, doc) {
-        console.log(err);
-      }
+      { upsert: true }
     );
   }
 }
