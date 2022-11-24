@@ -19,12 +19,19 @@ async function cronIp() {
     let res = await ping.promise.probe(host.ip, { timeout: 10 });
     data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
   }
-  data.map((item) => {
+
+  for (let item of data) {
+    console.log("updating");
+    console.log(item);
     IpList.findOneAndUpdate(
       { ip: item.ip },
-      { status: item.status ? "Alive" : "is Dead" }
+      { status: item.status },
+      { upsert: true },
+      function (err, doc) {
+        console.log(err);
+      }
     );
-  });
+  }
 }
 
 cron.schedule("*/60 * * * * *", () => {
