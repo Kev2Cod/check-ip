@@ -15,26 +15,35 @@ let data = [];
 async function cronIp() {
   console.log("cron running...");
   let allHost = await IpList.find();
+
   for (let host of allHost) {
     let res = await ping.promise.probe(host.ip, { timeout: 10 });
-    data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
-  }
-
-  console.log(data);
-
-  for (let item of data) {
+    // data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
+    console.log({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
     await IpList.findOneAndUpdate(
-      { ip: item.ip },
-      { status: item.status },
+      { ip: host.ip },
+      { status: res.alive ? "Alive" : "is Dead" },
       { upsert: true }
     );
   }
+
+  // const forLoop = async (data) => {
+  //   console.log("awal :", data);
+  //   for (let item of data) {
+
+  //   }
+  //   data = [];
+  // };
+
+  // forLoop(data);
 }
 
 cron.schedule("*/60 * * * * *", () => {
   cronIp();
   console.log("running a task every 60 seconds");
 });
+
+cronIp();
 
 app.get("/", async (req, res) => {
   let resp = await IpList.find();
