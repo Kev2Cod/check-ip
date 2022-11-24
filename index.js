@@ -33,10 +33,8 @@ async function cronIp() {
 
 cron.schedule("*/30 * * * * *", () => {
   cronIp();
-  console.log("running a task every 60 seconds");
+  console.log("running a task every 30 seconds");
 });
-
-cronIp();
 
 app.get("/", async (req, res) => {
   let resp = await IpList.find();
