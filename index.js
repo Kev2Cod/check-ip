@@ -16,7 +16,7 @@ async function cronIp() {
   console.log("cron running...");
   let allHost = await IpList.find();
   for (let host of allHost) {
-    let res = await ping.promise.probe(host.ip, { timeout: 10 });
+    let res = await ping.promise.probe(host.ip, { timeout: 30 });
     data.push({ ip: host.ip, status: res.alive ? "Alive" : "is Dead" });
   }
 
